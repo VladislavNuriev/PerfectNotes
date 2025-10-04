@@ -21,4 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Perfect Notes"
 include(":app")
- 
+include(":domain")
