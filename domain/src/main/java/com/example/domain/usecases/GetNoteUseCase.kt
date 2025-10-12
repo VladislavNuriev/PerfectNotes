@@ -4,7 +4,7 @@ import com.example.domain.NotesRepository
 import com.example.domain.models.Note
 
 class GetNoteUseCase(private val repository: NotesRepository) {
-    operator fun invoke(noteId: Int): Note {
+    suspend operator fun invoke(noteId: Int): Note {
         return repository.getNote(noteId)
     }
 }

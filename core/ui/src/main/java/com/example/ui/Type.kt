@@ -1,4 +1,4 @@
-package com.example.perfectnotes.ui.theme
+package com.example.ui
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
