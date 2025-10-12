@@ -40,6 +40,11 @@ android {
 }
 
 dependencies {
+    implementation(project(":feature:notes"))
+    implementation(project(":core:ui"))
+    implementation(project(":core:resources"))
+    implementation(project(":domain"))
+
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -49,6 +54,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

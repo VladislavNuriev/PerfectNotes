@@ -22,3 +22,8 @@ dependencyResolutionManagement {
 rootProject.name = "Perfect Notes"
 include(":app")
 include(":domain")
+include(":data")
+include(":feature:notes")
+include(":core:ui")
+include(":core:util")
+include(":core:resources")
