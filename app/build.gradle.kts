@@ -42,6 +42,7 @@ android {
 dependencies {
     implementation(project(":feature:notes"))
     implementation(project(":feature:createnote"))
+    implementation(project(":feature:editnote"))
     implementation(project(":core:ui"))
     implementation(project(":core:resources"))
     implementation(project(":domain"))
