@@ -5,8 +5,8 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.example.createnote.ui.CreateNoteScreen
-import com.example.notes.ui.NotesScreen
+import com.example.createnote.CreateNoteScreen
+import com.example.editnote.EditNoteScreen
 import com.example.ui.PerfectNotesTheme
 
 class MainActivity : ComponentActivity() {
@@ -15,7 +15,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             PerfectNotesTheme {
-                CreateNoteScreen(onFinished = { Log.d("MainActivity", "finished") })
+                EditNoteScreen(noteId = 5,
+                    onFinished = {Log.d("MainActivity", "finished")})
+                //CreateNoteScreen(onFinished = { Log.d("MainActivity", "finished") })
 //                NotesScreen(
 //                    onNoteClick = {
 //                        Log.d("MainActivity", "onNoteClicked: ${it.id} ")
