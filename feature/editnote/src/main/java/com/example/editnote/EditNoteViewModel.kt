@@ -1,7 +1,9 @@
 package com.example.editnote
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.data.NotesRepositoryImpl
 import com.example.data.TestRepositoryImpl
 import com.example.domain.models.Note
 import com.example.domain.usecases.DeleteNoteUseCase
@@ -12,9 +14,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class EditNoteViewModel(private val noteId: Int) : ViewModel() {
+class EditNoteViewModel(private val noteId: Int, context: Context) : ViewModel() {
 
-    private val repo: TestRepositoryImpl = TestRepositoryImpl
+    private val repo = NotesRepositoryImpl.getInstance(context)
     private val editNote: EditNoteUseCase = EditNoteUseCase(repo)
     private val getNote: GetNoteUseCase = GetNoteUseCase(repo)
     private val deleteNote: DeleteNoteUseCase = DeleteNoteUseCase(repo)

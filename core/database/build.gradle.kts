@@ -1,10 +1,11 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlinAndroidKsp)
 }
 
 android {
-    namespace = "com.example.data"
+    namespace = "com.example.database"
     compileSdk = 36
 
     defaultConfig {
@@ -33,13 +34,15 @@ android {
 }
 
 dependencies {
-    implementation(project(":domain"))
-    implementation(project(":core:database"))
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
 
+    //Room
     implementation(libs.androidx.room.runtime)
+    ksp(libs.androidx.room.compiler)
+    implementation(libs.androidx.room.ktx)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

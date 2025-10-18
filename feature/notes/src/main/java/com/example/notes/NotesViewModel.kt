@@ -2,8 +2,10 @@
 
 package com.example.notes
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.data.NotesRepositoryImpl
 import com.example.data.TestRepositoryImpl
 import com.example.domain.models.Note
 import com.example.domain.usecases.GetAllNotesUseCase
@@ -18,8 +20,8 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class NotesViewModel() : ViewModel() {
-    private val repo: TestRepositoryImpl = TestRepositoryImpl
+class NotesViewModel(context: Context) : ViewModel() {
+    private val repo = NotesRepositoryImpl.getInstance(context)
     private val getAllNotes: GetAllNotesUseCase = GetAllNotesUseCase(repo)
     private val searchNotes = SearchNotesUseCase(repo)
     private val switchPinnedStatus = SwitchPinnedStatusUseCase(repo)
