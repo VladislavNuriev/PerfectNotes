@@ -2,7 +2,7 @@
 
 Использованные технологии:
 
-Compose, Room, MVI + MVVM, Hilt, многомодульность
+Compose, MVI + MVVM, Coroutines Flow, Room,  Hilt, Jetpack Navigation многомодульность
 
 Вдохновлено макетом: https://www.figma.com/community/file/1290028598284961246/notes-taking-app
 
