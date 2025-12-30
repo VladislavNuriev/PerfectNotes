@@ -1,9 +1,12 @@
 package com.example.createnote
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -29,6 +32,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.example.domain.models.ContentItem
+import com.example.ui.AppIcons
 import com.example.util.DateFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -39,6 +44,15 @@ fun CreateNoteScreen(
     onFinished: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
+
+    val imagePicker = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent(),
+        onResult = { uri ->
+            uri?.let {
+                viewModel.processCommand(CreateNoteCommand.AddImage(it))
+            }
+        }
+    )
 
     when (val currentState = state) {
         is CreateNoteState.Creation ->
@@ -67,6 +81,18 @@ fun CreateNoteScreen(
                                     },
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = "Back",
+                                tint = MaterialTheme.colorScheme.onSurface
+                            )
+                        },
+                        actions = {
+                            Icon(
+                                modifier = Modifier
+                                    .padding(end = 24.dp)
+                                    .clickable {
+                                        imagePicker.launch("image/*")
+                                    },
+                                imageVector = AppIcons.AddPhoto,
+                                contentDescription = "add photo",
                                 tint = MaterialTheme.colorScheme.onSurface
                             )
                         }
@@ -110,33 +136,32 @@ fun CreateNoteScreen(
                         fontSize = 12.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    TextField(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 8.dp)
-                            .weight(1f),
-                        value = currentState.content,
-                        onValueChange = { text ->
-                            viewModel.processCommand(CreateNoteCommand.InputContent(text))
-                        },
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = Color.Transparent,
-                            unfocusedContainerColor = Color.Transparent,
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent
-                        ),
-                        placeholder = {
-                            Text(
-                                text = "Note something down",
-                                fontSize = 16.sp,
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)
-                            )
-                        },
-                        textStyle = TextStyle(
-                            fontSize = 16.sp,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                    )
+                    LazyColumn(
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        currentState.content.forEachIndexed { index, item ->
+                            item(key = index) {
+                                when (item) {
+                                    is ContentItem.Text -> TextContent(
+                                        textContent = item.content,
+                                        onTextChanged = {
+                                            viewModel.processCommand(
+                                                CreateNoteCommand.InputContent(
+                                                    content = it,
+                                                    index = index
+                                                )
+                                            )
+                                        }
+                                    )
+
+                                    is ContentItem.Image -> TextContent(
+                                        textContent = item.url,
+                                        onTextChanged = { }
+                                    )
+                                }
+                            }
+                        }
+                    }
                     Button(
                         modifier = Modifier
                             .padding(horizontal = 24.dp)
@@ -166,4 +191,36 @@ fun CreateNoteScreen(
             }
         }
     }
+}
+
+@Composable
+private fun TextContent(
+    modifier: Modifier = Modifier,
+    textContent: String,
+    onTextChanged: (String) -> Unit
+) {
+    TextField(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp),
+        value = textContent,
+        onValueChange = onTextChanged,
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = Color.Transparent,
+            unfocusedContainerColor = Color.Transparent,
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent
+        ),
+        placeholder = {
+            Text(
+                text = "Note something down",
+                fontSize = 16.sp,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)
+            )
+        },
+        textStyle = TextStyle(
+            fontSize = 16.sp,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+    )
 }

@@ -39,6 +39,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.example.domain.models.ContentItem
 import com.example.domain.models.Note
 import com.example.notes.NotesCommand
 import com.example.notes.NotesViewModel
@@ -61,7 +62,7 @@ fun NotesScreen(
         modifier = modifier,
         floatingActionButton = {
             FloatingActionButton(
-                onClick =  onAddNoteClick,
+                onClick = onAddNoteClick,
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary,
                 shape = CircleShape
@@ -280,13 +281,18 @@ private fun NoteCard(
             fontSize = 12.sp
         )
         Spacer(modifier = Modifier.height(24.dp))
-        Text(
-            text = note.content,
-            color = MaterialTheme.colorScheme.onSurface,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Medium,
-            maxLines = 3,
-            overflow = TextOverflow.Ellipsis
-        )
+        note.content
+            .filterIsInstance<ContentItem.Text>()
+            .joinToString("\n") { it.content }
+            .let {
+                Text(
+                    text = it,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium,
+                    maxLines = 3,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
     }
 }
