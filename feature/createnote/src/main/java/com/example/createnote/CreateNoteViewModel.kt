@@ -1,6 +1,5 @@
 package com.example.createnote
 
-import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.domain.models.ContentItem
@@ -63,7 +62,7 @@ class CreateNoteViewModel @Inject constructor(private val addNote: AddNoteUseCas
                     _state.update { previousState ->
                         if (previousState is CreateNoteState.Creation) {
                             val title = previousState.title
-                            val content = previousState.content.filter { it ->
+                            val content = previousState.content.filter {
                                 it !is ContentItem.Text || it.content.isNotBlank()
                             }
                             addNote(title = title, content = content)
@@ -78,7 +77,7 @@ class CreateNoteViewModel @Inject constructor(private val addNote: AddNoteUseCas
             is CreateNoteCommand.AddImage -> {
                 _state.update { previousState ->
                     if (previousState is CreateNoteState.Creation) {
-                        val newItems = previousState.content.toMutableStateList()
+                        val newItems = previousState.content.toMutableList()
                         val lastItem = newItems.last()
                         if (lastItem is ContentItem.Text && lastItem.content.isBlank()) {
                             newItems.removeAt(newItems.lastIndex)
@@ -86,6 +85,20 @@ class CreateNoteViewModel @Inject constructor(private val addNote: AddNoteUseCas
                         newItems.add(ContentItem.Image(command.uri.toString()))
                         newItems.add(ContentItem.Text(""))
                         previousState.copy(content = newItems)
+                    } else {
+                        previousState
+                    }
+                }
+            }
+
+            is CreateNoteCommand.DeleteImage -> {
+                _state.update { previousState ->
+                    if (previousState is CreateNoteState.Creation) {
+                        previousState.content.toMutableList().apply {
+                            removeAt(command.index)
+                        }.let {
+                            previousState.copy(content = it)
+                        }
                     } else {
                         previousState
                     }
