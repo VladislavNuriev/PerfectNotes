@@ -4,10 +4,11 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.example.database.models.NoteEntity
 
 @Database(
     entities = [NoteEntity::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class NotesDataBase : RoomDatabase() {
@@ -30,6 +31,7 @@ abstract class NotesDataBase : RoomDatabase() {
                     NotesDataBase::class.java,
                     "notes.db"
                 )
+                    .fallbackToDestructiveMigration(dropAllTables = true)
                     .build()
                 instance = db
                 return db

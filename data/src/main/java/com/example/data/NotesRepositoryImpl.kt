@@ -1,8 +1,8 @@
 package com.example.data
 
-import com.example.database.NoteEntity
 import com.example.database.NotesDao
 import com.example.domain.NotesRepository
+import com.example.domain.models.ContentItem
 import com.example.domain.models.Note
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -12,18 +12,18 @@ class NotesRepositoryImpl @Inject constructor(private val notesDao: NotesDao) : 
 
     override suspend fun addNote(
         title: String,
-        content: String,
+        content: List<ContentItem>,
         isPinned: Boolean,
         updatedAt: Long
     ) {
-        val noteEntity = NoteEntity(
+        val note = Note(
             id = 0,
             title = title,
             content = content,
             isPinned = isPinned,
             updatedAt = updatedAt
         )
-        notesDao.addNote(noteEntity)
+        notesDao.addNote(note.toNoteEntity())
     }
 
     override suspend fun deleteNote(noteId: Int) {
