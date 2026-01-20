@@ -8,7 +8,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-class NotesRepositoryImpl @Inject constructor(private val notesDao: NotesDao) : NotesRepository {
+class NotesRepositoryImpl @Inject constructor(
+    private val notesDao: NotesDao,
+    private val imageFileManager: ImageFileManager
+) : NotesRepository {
 
     override suspend fun addNote(
         title: String,
@@ -19,7 +22,7 @@ class NotesRepositoryImpl @Inject constructor(private val notesDao: NotesDao) : 
         val note = Note(
             id = 0,
             title = title,
-            content = content,
+            content = content.processForStorage(),
             isPinned = isPinned,
             updatedAt = updatedAt
         )
@@ -27,11 +30,27 @@ class NotesRepositoryImpl @Inject constructor(private val notesDao: NotesDao) : 
     }
 
     override suspend fun deleteNote(noteId: Int) {
+        val note = getNote(noteId)
         notesDao.deleteNote(noteId)
+
+        note.content
+            .filterIsInstance<ContentItem.Image>()
+            .map { it.url}
+            .forEach {
+                imageFileManager.deleteImage(it)
+            }
     }
 
     override suspend fun editNote(note: Note) {
-        notesDao.addNote(note.toNoteEntity())
+        val oldNote = getNote(note.id)
+
+        val oldUrls = oldNote.content.filterIsInstance<ContentItem.Image>().map { it.url }
+        val newUrls = note.content.filterIsInstance<ContentItem.Image>().map { it.url }
+        val removedUrls = oldUrls - newUrls
+        removedUrls.forEach { imageFileManager.deleteImage(it) }
+        note.content.processForStorage().let {
+            notesDao.addNote(note.copy(content = it).toNoteEntity())
+        }
     }
 
     override fun getAllNotes(): Flow<List<Note>> {
@@ -52,5 +71,22 @@ class NotesRepositoryImpl @Inject constructor(private val notesDao: NotesDao) : 
 
     override suspend fun switchPinnedStatus(noteId: Int) {
         notesDao.switchPinnedStatus(noteId)
+    }
+
+    private suspend fun List<ContentItem>.processForStorage(): List<ContentItem> {
+        return map { contentItem ->
+            when (contentItem) {
+                is ContentItem.Text -> contentItem
+                is ContentItem.Image -> {
+                    if (imageFileManager.isInternal(contentItem.url)) {
+                        contentItem
+                    } else {
+                        imageFileManager.copyImageToInternalStorage(contentItem.url).let {
+                            ContentItem.Image(it)
+                        }
+                    }
+                }
+            }
+        }
     }
 }
